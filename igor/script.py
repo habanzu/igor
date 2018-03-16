@@ -52,6 +52,13 @@ class Script (object):
         self.parser.add_argument(
             '-V', '--verbose', action='count', default=0,
             help='increment verbosity')
+        self.parser.add_argument(
+            '-x', '--execute', metavar='FILE', default='-',
+            help=('Path to a custom Python script, which will be executed on '
+                  'every wave file. The script can access the wave and the '
+                  'corresponding path through the global variables wave and '
+                  'dirpath.')
+        )
         self._num_plots = 0
 
     def run(self, *args, **kwargs):
@@ -85,6 +92,15 @@ class Script (object):
             _LOG.error('error plotting {}: {}'.format(title, error))
             pass
         self._num_plots += 1
+
+    def execute(self, args, wave, dirpath):
+        if args.execute == '-':
+            return  # no-op
+        try:
+            exec(open(args.execute).read(), {"wave": wave, "dirpath": dirpath})
+        except Exception as e:
+            _LOG.error('error executing on wave {} {}'.format(dirpath, e))
+            raise
 
     def display_plots(self):
         if self._num_plots:

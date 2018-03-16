@@ -42,11 +42,12 @@ class PackedScript (Script):
                 f.close()
         if args.verbose > 0:
             pprint.pprint(filesystem)
-        walk(filesystem, self._plot_wave_callback)
+        walk(filesystem, self._plot_wave_and_execute_callback)
 
-    def _plot_wave_callback(self, dirpath, key, value):
+    def _plot_wave_and_execute_callback(self, dirpath, key, value):
         if isinstance(value, WaveRecord):
             self.plot_wave(self.args, value.wave, title=dirpath + [key])
+            self.execute(self.args, value.wave, dirpath + [key])
 
 
 s = PackedScript(
